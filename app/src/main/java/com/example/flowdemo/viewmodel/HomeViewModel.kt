@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
 
 class HomeViewModel: ViewModel() {
@@ -25,10 +26,12 @@ class HomeViewModel: ViewModel() {
             repo.latestInteger
                 .filter { num ->  (num % 2) == 0 } //Intermediate operators used in flow to manipulate data
                 .map { filteredNum -> filteredNum + 9 }
+//                .withIndex() // map values with indexes
                 .flowOn(Dispatchers.Default) // upstream will be executing in default thread pool instead of main thread
                 .catch {
                     Log.e("Error", "error ----> ${it.message}")
                     emit(7777) // we can catch exceptions and also emit values
+//                    emit(IndexedValue(777, 7777)) // when using withIndex Operator
                 }
                 .collectLatest{ latestInteger -> // terminal operator to fetch data from flow
 //                    delay(500L) // If Items are producing faster than consumed and we are using collectLatest then only latest value will be collected unlike collect which collects all values
