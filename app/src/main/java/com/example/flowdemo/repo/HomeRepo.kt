@@ -24,6 +24,19 @@ class HomeRepo {
         }
     }
 
+
+    val latestString: Flow<String> = flow {
+        for(i in 10..<18) {
+            if(i == 15) {
+                throw CancellationException("Cancellation Exception Thrown Again")
+            }
+            Log.i("Integer", "i---> $i")
+            emit("$i")
+            delay(200L)
+        }
+    }
+
+
     //alternative of above code
 //    val latestInteger = listOf(1, 2, 3, 4, 5, 6, 7).asFlow()
 }

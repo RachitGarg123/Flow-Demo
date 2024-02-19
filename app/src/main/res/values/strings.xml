@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Flow Demo</string>
+    <string name="click_to_tested_flow">Click To Tested FLow</string>
 </resources>
