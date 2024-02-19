@@ -31,6 +31,7 @@ class HomeViewModel: ViewModel() {
                     emit(7777) // we can catch exceptions and also emit values
                 }
                 .collectLatest{ latestInteger -> // terminal operator to fetch data from flow
+//                    delay(500L) // If Items are producing faster than consumed and we are using collectLatest then only latest value will be collected unlike collect which collects all values
                     Log.i("Integer","latest integer ---> $latestInteger")
                 }
         }
