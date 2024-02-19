@@ -5,7 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.flowdemo.repo.HomeRepo
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
@@ -16,6 +18,8 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
@@ -41,6 +45,16 @@ class HomeViewModel: ViewModel() {
 //                    Log.i("Integer","latest integer ---> $latestInteger")
 //                }
             repo.latestString
+                .stateIn( // state in is used to convert a cold flow to a StateFlow
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000), // whileSubscribed is used to collect data as long as producer is active and we can allot some time to make it active for few more seconds {in this case its 5 sec, default value is 0} so if user has pressed back by mistake he can come back quickly and there wouldn't be any changes
+//                started = SharingStarted.Eagerly, // starts immediately and last forever until the scope is active
+//                started = SharingStarted.Lazily, // starts when there is one active subscriber and last forever until the scope is active
+                initialValue = "3")
+                .shareIn( // state in is used to convert a cold flow to a StateFlow
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(5000),
+                    replay = 1)
                 .filter { num ->  (num.toInt() % 2) == 0 } //Intermediate operators used in flow to manipulate data
                 .map { filteredNum -> filteredNum + 9 }
 //                .withIndex() // map values with indexes
