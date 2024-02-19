@@ -27,6 +27,7 @@ class HomeViewModel: ViewModel() {
                 .map { filteredNum -> filteredNum + 9 }
                 .flowOn(Dispatchers.Default) // upstream will be executing in default thread pool instead of main thread
                 .catch {
+                    Log.e("Error", "error ----> ${it.message}")
                     emit(7777) // we can catch exceptions and also emit values
                 }
                 .collectLatest{ latestInteger -> // terminal operator to fetch data from flow

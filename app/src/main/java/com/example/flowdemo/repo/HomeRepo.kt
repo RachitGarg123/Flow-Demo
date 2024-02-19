@@ -1,6 +1,7 @@
 package com.example.flowdemo.repo
 
 import android.util.Log
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -14,6 +15,9 @@ class HomeRepo {
 
     val latestInteger: Flow<Int> = flow {
         for(i in 0..<8) {
+            if(i == 5) {
+                throw CancellationException("Cancellation Exception Thrown")
+            }
             Log.i("Integer", "i---> $i")
             emit(i)
             delay(200L)
