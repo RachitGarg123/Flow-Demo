@@ -10,6 +10,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
@@ -20,6 +21,9 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
@@ -64,15 +68,20 @@ class HomeViewModel: ViewModel() {
                     emit("7777") // we can catch exceptions and also emit values
 //                    emit(IndexedValue(777, 7777)) // when using withIndex Operator
                 }
+                .take(2) // only 2 elements will be collected
+                .takeWhile {// we can give a condition inside takeWhile so that it only collect items that satisfies the condition and as soon as the condition fails it will not collect any other elements
+                    it.length > 2
+                }
+
 //                .combine(integerFlow) { valueOne, valueTwo -> // In case of combine operator it will not wait for the other flow to make pair with it instead it will let the values come and make pair ith the value currently flowing and als it makes flow with every value from other flow
 //                    "valueOne ---> $valueOne valueTwo -----> $valueTwo"
 //                }
 //                .zip(integerFlow) { valueOne, valueTwo -> // In case of zip operator values from both flows are zipped {collected from the output of zip including change in data type} and will wait for the other flow to emit a value to form a pair and minimum size will be taken i.e if one flow emits 1 value and other emits 10 values then only 1 pair will be formed
 //                    "valueOne ---> $valueOne valueTwo -----> $valueTwo"
 //                }
-                .collectLatest{ latestInteger -> // terminal operator to fetch data from flow
+                .collectIndexed { index, latestInteger -> // terminal operator to fetch data from flow
 //                    delay(500L) // If Items are producing faster than consumed and we are using collectLatest then only latest value will be collected unlike collect which collects all values
-                    Log.i("Integer","latest integer ---> $latestInteger")
+                    Log.i("Integer","index ----> $index latest integer ---> $latestInteger")
                 }
 //            val finalResult = merge(flowOne, flowTwo)
 //            finalResult.collectLatest {
