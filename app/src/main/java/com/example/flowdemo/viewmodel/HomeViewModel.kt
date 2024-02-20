@@ -54,7 +54,7 @@ class HomeViewModel: ViewModel() {
                 .shareIn( // state in is used to convert a cold flow to a StateFlow
                     scope = viewModelScope,
                     started = SharingStarted.WhileSubscribed(5000),
-                    replay = 1)
+                    replay = 1)// how many old values we need we can mention it in replay parameter
                 .filter { num ->  (num.toInt() % 2) == 0 } //Intermediate operators used in flow to manipulate data
                 .map { filteredNum -> filteredNum + 9 }
 //                .withIndex() // map values with indexes
