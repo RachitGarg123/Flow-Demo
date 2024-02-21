@@ -16,9 +16,11 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.fold
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
@@ -47,10 +49,20 @@ class HomeViewModel: ViewModel() {
                     emit(7777) // we can catch exceptions and also emit values
 //                    emit(IndexedValue(777, 7777)) // when using withIndex Operator
                 }
-//                .collectLatest{ latestInteger -> // terminal operator to fetch data from flow
-////                    delay(500L) // If Items are producing faster than consumed and we are using collectLatest then only latest value will be collected unlike collect which collects all values
-//                    Log.i("Integer","latest integer ---> $latestInteger")
+                .collectLatest{ latestInteger -> // terminal operator to fetch data from flow
+//                    delay(500L) // If Items are producing faster than consumed and we are using collectLatest then only latest value will be collected unlike collect which collects all values
+                    Log.i("Integer","latest integer ---> $latestInteger")
+                }
+//                .reduce{ accumulator, value -> // terminal operator like collect
+//                    accumulator*value // accumulator becomes accumulator * value
 //                }
+//                .fold(initial = 100) { accumulator, value -> // same as reduce only diff is it has an initial value
+//                    accumulator*value
+//                }
+//                .count{
+//                    it > 2
+//                }
+            Log.i("Integer3","integerFlow ----> $integerFlow") // this will be equal to the last value of accumulator
             repo.latestString
                 .stateIn( // state in is used to convert a cold flow to a StateFlow
                 scope = viewModelScope,
@@ -83,10 +95,10 @@ class HomeViewModel: ViewModel() {
 //                .zip(integerFlow) { valueOne, valueTwo -> // In case of zip operator values from both flows are zipped {collected from the output of zip including change in data type} and will wait for the other flow to emit a value to form a pair and minimum size will be taken i.e if one flow emits 1 value and other emits 10 values then only 1 pair will be formed
 //                    "valueOne ---> $valueOne valueTwo -----> $valueTwo"
 //                }
-                .collect { latestInteger -> // terminal operator to fetch data from flow
-                    delay(2000L) // If Items are producing faster than consumed and we are using collectLatest then only latest value will be collected unlike collect which collects all values
-                    Log.i("Integer","latest integer ---> $latestInteger")
-                }
+//                .collect { latestInteger -> // terminal operator to fetch data from flow
+//                    delay(2000L) // If Items are producing faster than consumed and we are using collectLatest then only latest value will be collected unlike collect which collects all values
+//                    Log.i("Integer","latest integer ---> $latestInteger")
+//                }
 //            val finalResult = merge(flowOne, flowTwo)
 //            finalResult.collectLatest {
 //                Log.i("MergedValues", "after merging ----> $it") // output ----> merged values coming from both flows in any unpredictable order
