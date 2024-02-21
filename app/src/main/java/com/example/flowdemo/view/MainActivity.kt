@@ -15,6 +15,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         homeViewModel = HomeViewModel()
         findViewById<AppCompatButton>(R.id.btnClick).setOnClickListener {
+//            homeViewModel.flatteningMap()
             homeViewModel.getLatestInteger()
         }
     }

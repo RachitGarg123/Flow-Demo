@@ -16,8 +16,11 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.fold
@@ -36,6 +39,25 @@ import kotlinx.coroutines.launch
 class HomeViewModel: ViewModel() {
 
     private val repo = HomeRepo()
+
+    fun flatteningMap() {
+        val flow1 = flow {
+            emit(1)
+            delay(500L)
+            emit(2)
+        }
+        viewModelScope.launch {
+            flow1.flatMapConcat { value -> // to covert two list into one
+                flow {
+                    emit(value+1)
+                    delay(500L)
+                    emit(value+2)
+                }
+            }.collect { value ->
+                println("The value is $value")
+            }
+        }
+    }
 
     fun getLatestInteger() {
         viewModelScope.launch {
@@ -83,7 +105,13 @@ class HomeViewModel: ViewModel() {
                     emit("7777") // we can catch exceptions and also emit values
 //                    emit(IndexedValue(777, 7777)) // when using withIndex Operator
                 }
-                .buffer(onBufferOverflow = BufferOverflow.DROP_LATEST) // DROP_LATEST drops the latest value and retain the old value whereas DROP_OLDEST does the opposite
+/*                buffer is used so that te upstream code runs on a different corouitine than the downstream coroutine
+                and a channel is created so that the two coroutine can communicate.
+                Buffer is used to deal with backpressure or buffer overflow i.e in case of producer producing faster than consumer consuming
+                By Default capacity is 64 and BufferOverflow.SUSPENDED so that the coroutine get suspended
+                Unlimited capacity should be avoided to avoid out of memory exceptions */
+                .buffer(capacity = 1, onBufferOverflow = BufferOverflow.DROP_LATEST) // DROP_LATEST drops the latest value and retain the old value whereas DROP_OLDEST does the opposite
+                .conflate() // conflate is similar to buffer except that in conflate the value will continue collecting as soon as collector is free with the current value emitted and dropping middle values
 //                .take(2) // only 2 elements will be collected
 //                .takeWhile {// we can give a condition inside takeWhile so that it only collect items that satisfies the condition and as soon as the condition fails it will not collect any other elements
 //                    it.length > 2
