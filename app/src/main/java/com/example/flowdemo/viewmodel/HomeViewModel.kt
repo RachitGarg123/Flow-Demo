@@ -8,8 +8,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
@@ -56,6 +60,17 @@ class HomeViewModel: ViewModel() {
             }.collect { value ->
                 println("The value is $value")
             }
+        }
+    }
+
+    private val _combinedFlow: MutableStateFlow<Int> = MutableStateFlow(0)
+    val combinedFlow = _combinedFlow.asStateFlow()
+    fun tryCombine() {
+        val flow1 = (1..5).asFlow()
+        val flow2 = (10..15).asFlow()
+        val flow3 = (20..25).asFlow()
+        combine(flow1, flow2, flow3) { value1, value2, value3 -> // we can use combine operator to combine multiple states and observe value when either one parameter changes
+            _combinedFlow.value = (value1 + value2 + value3)
         }
     }
 
